@@ -63,7 +63,7 @@ function printOut(content) {
 
 function checkOrderNotReturnPromiseInThen(every_links) {
     var sequence = Promise.resolve();
-    return every_links.forEach( function(link) {
+    every_links.forEach( function(link) {
         sequence = sequence.then(function() {
             setTimeout(function(){
                 console.log("==" + link + "==");
@@ -82,7 +82,7 @@ function randomProcessTimePromise(content) {
 
 function checkOrderReturnPromiseWithForEach(every_links) {
     var sequence = Promise.resolve();
-    return every_links.forEach( function(link) {
+    every_links.forEach( function(link) {
         sequence = sequence.then(function() {
             return randomProcessTimePromise(link);
         }).then(
@@ -126,7 +126,7 @@ requestPromise(options).then(
     // checkOrderNotReturnPromiseInThen // not in order
     // checkOrderReturnPromiseWithForEach
     // checkOrderReturnPromiseWithReduce
-    //checkOrderReturnPromiseWithAll
+    // checkOrderReturnPromiseWithAll
     checkOrderReturnPromiseWithMapReduce
 ).catch(function(err) {
     console.log(err);
