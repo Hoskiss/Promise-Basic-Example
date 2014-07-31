@@ -63,7 +63,7 @@ function printOut(content) {
 
 function checkOrderNotReturnPromiseInThen(every_links) {
     var sequence = Promise.resolve();
-    every_links.forEach( function(link) {
+    return every_links.forEach( function(link) {
         sequence = sequence.then(function() {
             setTimeout(function(){
                 console.log("==" + link + "==");
@@ -82,7 +82,7 @@ function randomProcessTimePromise(content) {
 
 function checkOrderReturnPromiseWithForEach(every_links) {
     var sequence = Promise.resolve();
-    every_links.forEach( function(link) {
+    return every_links.forEach( function(link) {
         sequence = sequence.then(function() {
             return randomProcessTimePromise(link);
         }).then(
@@ -91,20 +91,43 @@ function checkOrderReturnPromiseWithForEach(every_links) {
     });
 }
 
-// not in order
-requestPromise(options).then(
-    parseEveryLinks
-).then(
-    checkOrderNotReturnPromiseInThen
-).catch(function(err) {
-    console.log(err);
-});
+function checkOrderReturnPromiseWithReduce(every_links) {
+    return every_links.reduce( function(sequence, link) {
+        return sequence.then(function() {
+            return randomProcessTimePromise(link);
+        }).then(
+            printOut
+        );
+    }, Promise.resolve());
+}
 
-// in order
+function checkOrderReturnPromiseWithAll(every_links) {
+    return Promise.all(
+        every_links.map(randomProcessTimePromise)
+    ).then(function(prosess_links) {
+        prosess_links.forEach(printOut);
+    });
+}
+
+function checkOrderReturnPromiseWithMapReduce(every_links) {
+    return every_links.map(
+        randomProcessTimePromise).reduce( function(sequence, process_link) {
+            return sequence.then(function() {
+                return process_link;
+            }).then(
+                printOut
+            );
+        }, Promise.resolve());
+}
+
 requestPromise(options).then(
     parseEveryLinks
 ).then(
-    checkOrderReturnPromiseWithForEach
+    // checkOrderNotReturnPromiseInThen // not in order
+    // checkOrderReturnPromiseWithForEach
+    // checkOrderReturnPromiseWithReduce
+    //checkOrderReturnPromiseWithAll
+    checkOrderReturnPromiseWithMapReduce
 ).catch(function(err) {
     console.log(err);
 });

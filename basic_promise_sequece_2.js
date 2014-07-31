@@ -61,17 +61,6 @@ function printOut(content) {
     console.log(content);
 }
 
-function checkOrderNotReturnPromiseInThen(every_links) {
-    var sequence = Promise.resolve();
-    every_links.forEach( function(link) {
-        sequence = sequence.then(function() {
-            setTimeout(function(){
-                console.log("==" + link + "==");
-            }, Math.random()*100);
-        });
-    });
-}
-
 function randomProcessTimePromise(content) {
     return new Promise(function(resolve, reject) {
         setTimeout(function(){
@@ -80,33 +69,21 @@ function randomProcessTimePromise(content) {
     });
 }
 
-function checkOrderReturnPromiseWithForEach(every_links) {
-    var sequence = Promise.resolve();
-    every_links.forEach( function(link) {
-        sequence = sequence.then(function() {
+function checkOrderReturnPromiseWithReduce(every_links) {
+    every_links.reduce( function(sequence, link) {
+        return sequence.then(function() {
             return randomProcessTimePromise(link);
         }).then(
             printOut
         );
-    });
+    }, Promise.resolve());
 }
-
-// not in order
-requestPromise(options).then(
-    parseEveryLinks
-).then(
-    checkOrderNotReturnPromiseInThen
-).catch(function(err) {
-    console.log(err);
-});
 
 // in order
 requestPromise(options).then(
     parseEveryLinks
 ).then(
-    checkOrderReturnPromiseWithForEach
+    checkOrderReturnPromiseWithReduce
 ).catch(function(err) {
     console.log(err);
 });
-
-
